@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pátio Artese Veículos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,700;1,800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Layout: cabeçalho azul claro com faixa vermelha diagonal, filtros fixos no topo ao rolar,
+     duas seções (prontos e em preparação) em grade de cards. Tema único, na identidade da Artese. */
+  :root {
+    color-scheme: light;
+    --azul-fundo: #07153A;
+    --azul-topo: #E4EEFA;
+    --azul-faixa: #CADDF4;
+    --texto-topo: #2E4677;
+    --azul: #0B2154;
+    --vermelho: #CE181E;
+    --claro: #B9C8E2;
+    --papel: #EEF1F7;
+    --cartao: #FFFFFF;
+    --tinta: #0E1830;
+    --tinta-suave: #4B5878;
+    --linha: #D5DBE8;
+    --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+    --corpo: "Poppins", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--papel); color: var(--tinta); font-family: var(--corpo); font-size: 15px; line-height: 1.5; }
+  img, svg { max-width: 100%; display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--vermelho); outline-offset: 2px; }
+
+  .topo { position: relative; overflow: hidden; background: var(--azul-topo); color: var(--azul); }
+  .topo::before { content: ""; position: absolute; right: -150px; top: -40px; bottom: -40px; width: 260px;
+    background: var(--azul-faixa); transform: skewX(-18deg); }
+  .topo::after { content: ""; position: absolute; right: -6px; top: -40px; bottom: -40px; width: 18px;
+    background: var(--vermelho); transform: skewX(-18deg); }
+  .topo-in { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 22px 16px 26px;
+    display: flex; flex-direction: column; gap: 14px; }
+  .logo { width: 120px; height: auto; }
+  .olho { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--texto-topo); }
+  h1 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 800; font-size: clamp(40px, 11vw, 64px);
+    line-height: .92; text-transform: uppercase; letter-spacing: .01em; text-wrap: balance; max-width: 11ch; }
+  h1 em { font-style: inherit; color: var(--azul); box-shadow: inset 0 -0.16em 0 var(--vermelho); }
+  .lead { margin: 0; max-width: 30ch; color: var(--texto-topo); }
+  .lead strong { color: var(--azul); font-weight: 600; }
+
+  .garantia { background: var(--vermelho); color: #fff; }
+  .garantia p { max-width: 1120px; margin: 0 auto; padding: 10px 16px; font-size: 13px; font-weight: 500; }
+
+  .filtros { position: sticky; top: 0; z-index: 5; background: var(--papel); border-bottom: 1px solid var(--linha); }
+  .filtros-in { max-width: 1120px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 8px; overflow-x: auto;
+    scrollbar-width: none; }
+  .filtros-in::-webkit-scrollbar { display: none; }
+  .chip { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px;
+    border: 1.5px solid var(--azul); background: transparent; color: var(--azul); font: 500 14px/1 var(--corpo); cursor: pointer; }
+  .chip .n { font-size: 12px; font-variant-numeric: tabular-nums; opacity: .7; }
+  .chip[aria-pressed="true"] { background: var(--azul); color: #fff; }
+
+  main { max-width: 1120px; margin: 0 auto; padding: 16px 16px 40px; display: flex; flex-direction: column; gap: 34px; }
+  .conta { margin: 0 0 -20px; font-size: 13px; color: var(--tinta-suave); }
+  .secao[hidden] { display: none; }
+  .secao-topo { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+  .secao h2 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 800; font-size: 32px; line-height: 1;
+    text-transform: uppercase; color: var(--azul); display: flex; align-items: baseline; gap: 10px; }
+  .secao h2 .n { font-style: normal; font-weight: 700; font-size: 18px; color: #fff; background: var(--vermelho);
+    padding: 2px 9px; border-radius: 6px; font-variant-numeric: tabular-nums; }
+  .secao-prep h2 .n { background: var(--azul); }
+  .secao-topo p { margin: 0; color: var(--tinta-suave); max-width: 60ch; }
+
+  .grade { display: grid; gap: 18px; grid-template-columns: 1fr; }
+  @media (min-width: 680px) { .grade { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1020px) { .grade { grid-template-columns: repeat(3, 1fr); } }
+
+  .card { display: flex; flex-direction: column; background: var(--cartao); border: 1px solid var(--linha); border-radius: 10px; overflow: hidden; }
+  .card[hidden] { display: none; }
+  .foto { position: relative; background: var(--claro); aspect-ratio: 4 / 3; }
+  .foto img, .foto svg { width: 100%; height: 100%; object-fit: cover; }
+  .selo { position: absolute; left: 0; top: 14px; padding: 5px 16px 5px 12px; background: var(--vermelho); color: #fff;
+    font: italic 700 15px/1.1 var(--display); letter-spacing: .05em; text-transform: uppercase;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+  .selo-prep { background: var(--azul); }
+  .tag-foto { position: absolute; right: 10px; bottom: 10px; padding: 4px 9px; border-radius: 5px;
+    background: rgba(11, 33, 84, .82); color: #fff; font-size: 11px; font-weight: 500; }
+  .corpo { flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 14px 14px 16px; }
+  .marca { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--tinta-suave); }
+  h3 { margin: -8px 0 0; font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1; text-transform: uppercase;
+    color: var(--azul); text-wrap: balance; }
+  .sub { margin: -4px 0 0; font-weight: 500; }
+  .preco { margin: 0; font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1; color: var(--vermelho);
+    font-variant-numeric: tabular-nums; }
+  .specs { margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .spec { padding: 6px 10px; border-radius: 6px; background: var(--papel); }
+  .spec dt { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); }
+  .spec dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pts { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--tinta-suave); }
+  .pts li { padding-left: 14px; position: relative; }
+  .pts li::before { content: ""; position: absolute; left: 0; top: .62em; width: 7px; height: 2px; background: var(--vermelho); }
+  .nota { margin: 0; font-size: 14px; color: var(--tinta-suave); }
+  .acoes { margin-top: auto; padding-top: 6px; display: flex; flex-direction: column; gap: 8px; }
+  .btn { display: block; padding: 12px 14px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: 600; font-size: 15px; }
+  .btn-wa { background: var(--vermelho); color: #fff; }
+  .btn-ml { border: 1.5px solid var(--azul); color: var(--azul); }
+
+  .rodape { background: var(--azul-fundo); color: var(--claro); }
+  .rodape-in { max-width: 1120px; margin: 0 auto; padding: 28px 16px 36px; display: grid; gap: 20px; }
+  @media (min-width: 680px) { .rodape-in { grid-template-columns: 1.3fr 1fr 1fr; } }
+  .rodape h3 { margin: 0 0 6px; font-family: var(--display); font-style: italic; font-weight: 700; font-size: 20px; text-transform: uppercase; color: #fff; }
+  .rodape p { margin: 0; font-size: 14px; }
+  .rodape a { color: #fff; }
+  .rodape .btn-wa { margin-top: 10px; display: inline-block; }
+  .atual { grid-column: 1 / -1; font-size: 12px; opacity: .75; }
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-in">
+    <img class="logo" src="fotos/logo.png" alt="Artese Veículos" width="220" height="111">
+    <p class="olho">Guarulhos, SP · Via Dutra km 211</p>
+    <h1>O pátio da <em>Artese</em></h1>
+    <p class="lead"><strong>28 veículos no pátio.</strong> 14 prontos pra rodar e 14 em preparação. Escolha o seu e chame a loja no WhatsApp.</p>
+  </div>
+</header>
+<div class="garantia"><p>Caminhões com garantia de 90 dias de motor, câmbio e diferencial.</p></div>
+
+<nav class="filtros" aria-label="Filtrar por tipo">
+  <div class="filtros-in"><button type="button" class="chip" data-f="todos" aria-pressed="true">Todos <span class="n">28</span></button><button type="button" class="chip" data-f="bau" aria-pressed="false">Baú <span class="n">12</span></button><button type="button" class="chip" data-f="refrigerado" aria-pressed="false">Refrigerado <span class="n">3</span></button><button type="button" class="chip" data-f="sider" aria-pressed="false">Sider <span class="n">1</span></button><button type="button" class="chip" data-f="carroceria" aria-pressed="false">Carroceria <span class="n">3</span></button><button type="button" class="chip" data-f="basculante" aria-pressed="false">Basculante <span class="n">1</span></button><button type="button" class="chip" data-f="chassi" aria-pressed="false">No chassi <span class="n">4</span></button><button type="button" class="chip" data-f="rollon" aria-pressed="false">Roll-on <span class="n">1</span></button><button type="button" class="chip" data-f="cavalo" aria-pressed="false">Cavalo <span class="n">2</span></button><button type="button" class="chip" data-f="carreta" aria-pressed="false">Carreta <span class="n">1</span></button></div>
+</nav>
+
+<main>
+  <p class="conta" id="conta" aria-live="polite">Mostrando 28 de 28 veículos</p>
+
+  <section class="secao" aria-labelledby="t-prontos">
+    <div class="secao-topo">
+      <h2 id="t-prontos">Prontos pra rodar <span class="n" data-n>14</span></h2>
+      <p>Já passaram pela oficina e estão anunciados.</p>
+    </div>
+    <div class="grade">
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/atego2426.jpg" alt="Mercedes-Benz Atego 2426 2017/18, baú de alumínio de 9 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Mercedes-Benz</p>
+          <h3>Atego 2426</h3>
+          <p class="sub">6x2 · Baú de alumínio de 9 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2017/18</dd></div><div class="spec"><dt>Tração</dt><dd>6x2</dd></div><div class="spec"><dt>Km</dt><dd>203.389</dd></div></dl>
+          <ul class="pts"><li>Baú de 9,00 x 2,60 x 2,80 m com piso chapeado</li><li>Cabine estendida</li><li>Único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Atego%202426%202017/18%20%28ba%C3%BA%20de%20alum%C3%ADnio%20de%209%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Atego%202426%202017/18%20%28ba%C3%BA%20de%20alum%C3%ADnio%20de%209%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-6365883136-mb-atego-2426-6x2-ano-20172018-com-bau-de-aluminio-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/vw24280plataforma.jpg" alt="Volkswagen Constellation 24.280 2022/23, baú de alumínio de 10,2 m com plataforma, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Constellation 24.280</h3>
+          <p class="sub">6x2 · Baú de alumínio de 10,2 m com plataforma</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2022/23</dd></div><div class="spec"><dt>Tração</dt><dd>6x2</dd></div><div class="spec"><dt>Km</dt><dd>76.395</dd></div></dl>
+          <ul class="pts"><li>Plataforma elevatória HBZ para 1.500 kg</li><li>Cabine estendida, ar-condicionado e vidros elétricos</li><li>Único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202022/23%20%28ba%C3%BA%20de%20alum%C3%ADnio%20de%2010%2C2%20m%20com%20plataforma%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202022/23%20%28ba%C3%BA%20de%20alum%C3%ADnio%20de%2010%2C2%20m%20com%20plataforma%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-7585133692-vw-24280-ano-2023-c-bau-de-aluminio-102-mts-c-plataforma-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/vw24280bau10.jpg" alt="Volkswagen Constellation 24.280 2022/23, baú de alumínio de 10 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Constellation 24.280</h3>
+          <p class="sub">6x2 · Baú de alumínio de 10 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2022/23</dd></div><div class="spec"><dt>Tração</dt><dd>6x2</dd></div><div class="spec"><dt>Km</dt><dd>193.141</dd></div></dl>
+          <ul class="pts"><li>Cabine estendida, ar-condicionado e vidros elétricos</li><li>Rádio AM/FM</li><li>Único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202022/23%20%28ba%C3%BA%20de%20alum%C3%ADnio%20de%2010%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202022/23%20%28ba%C3%BA%20de%20alum%C3%ADnio%20de%2010%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-4794233873-vw-constellation-24280-ano-2023-c-bau-de-aluminio-10-mts-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/deliveryexpress.jpg" alt="Volkswagen Delivery Express 2024/25, baú de 4,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Delivery Express</h3>
+          <p class="sub">4x2 · Baú de 4,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2024/25</dd></div><div class="spec"><dt>Tração</dt><dd>4x2</dd></div><div class="spec"><dt>Km</dt><dd>91.996</dd></div></dl>
+          <ul class="pts"><li>Baú de 4,20 x 2,20 x 2,40 m</li><li>Assistente de partida em rampa e controle de estabilidade</li><li>Ar-condicionado, vidros elétricos e único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-5391418021-vw-delivery-express-prime-ano-2025-c-bau-de-aluminio-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="refrigerado" data-qtd="1">
+        <div class="foto"><img src="fotos/accelo1316.jpg" alt="Mercedes-Benz Accelo 1316 2019/20, baú refrigerado de 5,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Mercedes-Benz</p>
+          <h3>Accelo 1316</h3>
+          <p class="sub">6x2 · Baú refrigerado de 5,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2019/20</dd></div><div class="spec"><dt>Tração</dt><dd>6x2</dd></div><div class="spec"><dt>Km</dt><dd>314.427</dd></div></dl>
+          <ul class="pts"><li>Aparelho Frigo King Apollo 3500 Max Plus, até -18 °C</li><li>Porta lateral e divisória</li><li>Cabine estendida, ar-condicionado e único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Accelo%201316%202019/20%20%28ba%C3%BA%20refrigerado%20de%205%2C20%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Accelo%201316%202019/20%20%28ba%C3%BA%20refrigerado%20de%205%2C20%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-6588191388-mb-accelo-1316-6x2ano-201920-bau-de-fibra-ap-frigo-king-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="refrigerado" data-qtd="1">
+        <div class="foto"><img src="fotos/accelo1016refri.jpg" alt="Mercedes-Benz Accelo 1016 2022/23, baú refrigerado de 5,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Mercedes-Benz</p>
+          <h3>Accelo 1016</h3>
+          <p class="sub">4x2 · Baú refrigerado de 5,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2022/23</dd></div><div class="spec"><dt>Tração</dt><dd>4x2</dd></div><div class="spec"><dt>Km</dt><dd>97.879</dd></div></dl>
+          <ul class="pts"><li>Baú de fibra Labonia com aparelho Thermo Star</li><li>Porta lateral, divisória e piso canaletado</li><li>Cabine estendida, ar-condicionado e único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Accelo%201016%202022/23%20%28ba%C3%BA%20refrigerado%20de%205%2C20%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Accelo%201016%202022/23%20%28ba%C3%BA%20refrigerado%20de%205%2C20%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-7469916202-mb-accelo-1016-4x2-ano-2223-bau-de-fibra-e-ap-de-refrig-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="carroceria" data-qtd="1">
+        <div class="foto"><img src="fotos/vw11180.jpg" alt="Volkswagen 11.180 2023/24, carroceria de ferro de 5,10 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>11.180</h3>
+          <p class="sub">4x2 · Carroceria de ferro de 5,10 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2023/24</dd></div><div class="spec"><dt>Tração</dt><dd>4x2</dd></div><div class="spec"><dt>Km</dt><dd>71.369</dd></div></dl>
+          <ul class="pts"><li>Carroceria de 5,10 x 2,20 m</li><li>Único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%2011.180%202023/24%20%28carroceria%20de%20ferro%20de%205%2C10%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%2011.180%202023/24%20%28carroceria%20de%20ferro%20de%205%2C10%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-4794402547-volkswagen-11180-ano-2024-c-carroceria-de-ferro-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="carroceria" data-qtd="1">
+        <div class="foto"><img src="fotos/cargo1519.jpg" alt="Ford Cargo 1519 2012/13, carroceria de ferro de 7 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Ford</p>
+          <h3>Cargo 1519</h3>
+          <p class="sub">4x2 · Carroceria de ferro de 7 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2012/13</dd></div><div class="spec"><dt>Tração</dt><dd>4x2</dd></div><div class="spec"><dt>Km</dt><dd>565.041</dd></div></dl>
+          <ul class="pts"><li>Carroceria de 7,00 x 2,60 m</li><li>Cabine estendida</li><li>Climatizador e vidros elétricos</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Ford%20Cargo%201519%202012/13%20%28carroceria%20de%20ferro%20de%207%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Ford%20Cargo%201519%202012/13%20%28carroceria%20de%20ferro%20de%207%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-5516871945-ford-cargo-1519-201213-c-carroceria-de-ferro-7-mts-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="basculante" data-qtd="1">
+        <div class="foto"><img src="fotos/vw17260.jpg" alt="Volkswagen Constellation 17.260 Robust 2021/22, basculante, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Constellation 17.260 Robust</h3>
+          <p class="sub">4x2 · Basculante</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2021/22</dd></div><div class="spec"><dt>Tração</dt><dd>4x2</dd></div><div class="spec"><dt>Km</dt><dd>38.969</dd></div></dl>
+          
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2017.260%20Robust%202021/22%20%28basculante%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2017.260%20Robust%202021/22%20%28basculante%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-5100255013-vw-cosntellation-17260-robust-ano-202122-basculante-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="chassi" data-qtd="1">
+        <div class="foto"><img src="fotos/vw24280bitruck.jpg" alt="Volkswagen Constellation 24.280 Bitruck 2017/18, no chassi, 9,50 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Constellation 24.280 Bitruck</h3>
+          <p class="sub">8x2 · No chassi, 9,50 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2017/18</dd></div><div class="spec"><dt>Tração</dt><dd>8x2</dd></div><div class="spec"><dt>Km</dt><dd>517.767</dd></div></dl>
+          <ul class="pts"><li>Câmbio automático</li><li>Cabine leito teto baixo</li><li>Ar-condicionado, vidros e retrovisores elétricos, único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%20Bitruck%202017/18%20%28no%20chassi%2C%209%2C50%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%20Bitruck%202017/18%20%28no%20chassi%2C%209%2C50%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-7717405936-vw-24280-8x2-cleito-tbaixo-ano-2018-no-chassi-950-mts-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="chassi" data-qtd="1">
+        <div class="foto"><img src="fotos/accelo1016chassi.jpg" alt="Mercedes-Benz Accelo 1016 2020/20, no chassi, 5,30 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Mercedes-Benz</p>
+          <h3>Accelo 1016</h3>
+          <p class="sub">No chassi, 5,30 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2020/20</dd></div><div class="spec"><dt>Km</dt><dd>326.995</dd></div></dl>
+          <ul class="pts"><li>6 pneus novos</li><li>Manual do veículo e chave reserva</li><li>Único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Accelo%201016%202020/20%20%28no%20chassi%2C%205%2C30%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Accelo%201016%202020/20%20%28no%20chassi%2C%205%2C30%20m%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-4591760859-mercedes-benz-accelo-1016-ano-202020-no-chasi-de-530-mts-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="rollon" data-qtd="1">
+        <div class="foto"><img src="fotos/vw24280rollon.jpg" alt="Volkswagen Constellation 24.280 2017/18, roll-on/roll-off, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Constellation 24.280</h3>
+          <p class="sub">6x2 · Roll-on/roll-off</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2017/18</dd></div><div class="spec"><dt>Tração</dt><dd>6x2</dd></div><div class="spec"><dt>Km</dt><dd>226.865</dd></div></dl>
+          <ul class="pts"><li>Cabine estendida</li><li>Ar-condicionado e vidros elétricos</li><li>Único dono</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202017/18%20%28roll-on/roll-off%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202017/18%20%28roll-on/roll-off%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-7951461322-vw-constellation-24280-ano-201718-c-roll-on-roll-of-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="cavalo" data-qtd="1">
+        <div class="foto"><img src="fotos/volvovm330.jpg" alt="Volvo VM 330 I-Shift 2014/15, cavalo mecânico, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Volvo</p>
+          <h3>VM 330 I-Shift</h3>
+          <p class="sub">4x2 · Cavalo mecânico</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2014/15</dd></div><div class="spec"><dt>Tração</dt><dd>4x2</dd></div><div class="spec"><dt>Km</dt><dd>647.864</dd></div></dl>
+          <ul class="pts"><li>Câmbio automático I-Shift e cabine leito</li><li>Ar-condicionado, piloto automático e computador de bordo</li><li>6 pneus seminovos</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volvo%20VM%20330%20I-Shift%202014/15%20%28cavalo%20mec%C3%A2nico%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volvo%20VM%20330%20I-Shift%202014/15%20%28cavalo%20mec%C3%A2nico%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://caminhao.mercadolivre.com.br/MLB-6471821040-volvo-vm-330-i-shift-4x2-ano-2015-cleito-e-automatica-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="carreta" data-qtd="1">
+        <div class="foto"><img src="fotos/carretaedarp.jpg" alt="Edarp Carreta baú 30 paletes 2022/22, semirreboque, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo">Pronto pra rodar</span></div>
+        <div class="corpo">
+          <p class="marca">Edarp</p>
+          <h3>Carreta baú 30 paletes</h3>
+          <p class="sub">Semirreboque</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2022/22</dd></div></dl>
+          <ul class="pts"><li>15,40 x 2,60 x 3,00 m</li><li>Porta lateral</li><li>Piso chapeado</li></ul>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Edarp%20Carreta%20ba%C3%BA%2030%20paletes%202022/22%20%28semirreboque%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Edarp%20Carreta%20ba%C3%BA%2030%20paletes%202022/22%20%28semirreboque%29%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a><a class="btn btn-ml" href="https://veiculo.mercadolivre.com.br/MLB-6574821408-carreta-semi-reboque-edarp-ano-202222-para-30-paletes-_JM" target="_blank" rel="noopener">Ver anúncio no Mercado Livre</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="secao secao-prep" aria-labelledby="t-prep">
+    <div class="secao-topo">
+      <h2 id="t-prep">Em preparação <span class="n" data-n>14</span></h2>
+      <p>Acabaram de chegar e estão passando pela oficina. As fotos reais entram aqui assim que ficarem prontos.</p>
+    </div>
+    <div class="grade">
+      <article class="card" data-tipo="cavalo" data-qtd="1">
+        <div class="foto"><svg viewBox="0 0 400 300" role="img" aria-label="Ilustração de Volvo FH 460, cavalo mecânico" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g-cavalo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E4EEFA"/><stop offset="1" stop-color="#C6DAF2"/></linearGradient></defs><rect width="400" height="300" fill="url(#g-cavalo)"/><path d="M360 0 L400 0 L400 300 L270 300 Z" fill="#CADDF4"/><path d="M352 0 L366 0 L276 300 L262 300 Z" fill="#CE181E" opacity=".9"/><rect x="0" y="238" width="400" height="4" fill="#0B2154" opacity=".18"/><rect x="110" y="204" width="210" height="12" rx="2" fill="#0B2154"/><rect x="150" y="196" width="56" height="8" rx="3" fill="#CE181E"/><path d="M232 216 L232 102 Q232 96 238 96 L316 96 L330 130 L330 216 Z" fill="#0B2154"/><path d="M242 106 L312 106 L324 130 L242 130 Z" fill="#B9C8E2"/><rect x="322" y="190" width="8" height="10" rx="2" fill="#B9C8E2"/><circle cx="160" cy="219" r="19" fill="#0B2154"/><circle cx="160" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="206" cy="219" r="19" fill="#0B2154"/><circle cx="206" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="300" cy="219" r="19" fill="#0B2154"/><circle cx="300" cy="219" r="8.0" fill="#B9C8E2"/><text x="20" y="282" font-family="Poppins, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#0B2154" opacity=".75">FOTOS EM BREVE</text></svg><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volvo</p>
+          <h3>FH 460</h3>
+          <p class="sub">6x2 · Cavalo mecânico</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2021/22</dd></div><div class="spec"><dt>Tração</dt><dd>6x2</dd></div><div class="spec"><dt>Km</dt><dd>491.830</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volvo%20FH%20460%202021/22%20%28cavalo%20mec%C3%A2nico%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volvo%20FH%20460%202021/22%20%28cavalo%20mec%C3%A2nico%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="sider" data-qtd="1">
+        <div class="foto"><svg viewBox="0 0 400 300" role="img" aria-label="Ilustração de Volvo VM 270, sider" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g-sider" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E4EEFA"/><stop offset="1" stop-color="#C6DAF2"/></linearGradient></defs><rect width="400" height="300" fill="url(#g-sider)"/><path d="M360 0 L400 0 L400 300 L270 300 Z" fill="#CADDF4"/><path d="M352 0 L366 0 L276 300 L262 300 Z" fill="#CE181E" opacity=".9"/><rect x="0" y="238" width="400" height="4" fill="#0B2154" opacity=".18"/><rect x="52" y="204" width="220" height="12" rx="2" fill="#0B2154"/><rect x="52" y="88" width="202" height="116" rx="4" fill="#0B2154"/><rect x="52" y="188" width="202" height="6" fill="#CE181E"/><rect x="74" y="96" width="3" height="92" fill="#B9C8E2" opacity=".55"/><rect x="96" y="96" width="3" height="92" fill="#B9C8E2" opacity=".55"/><rect x="118" y="96" width="3" height="92" fill="#B9C8E2" opacity=".55"/><rect x="140" y="96" width="3" height="92" fill="#B9C8E2" opacity=".55"/><rect x="162" y="96" width="3" height="92" fill="#B9C8E2" opacity=".55"/><rect x="184" y="96" width="3" height="92" fill="#B9C8E2" opacity=".55"/><rect x="206" y="96" width="3" height="92" fill="#B9C8E2" opacity=".55"/><rect x="228" y="96" width="3" height="92" fill="#B9C8E2" opacity=".55"/><path d="M262 216 L262 124 Q262 118 268 118 L326 118 L340 152 L340 216 Z" fill="#0B2154"/><path d="M272 128 L322 128 L334 152 L272 152 Z" fill="#B9C8E2"/><rect x="332" y="190" width="8" height="10" rx="2" fill="#B9C8E2"/><circle cx="96" cy="219" r="19" fill="#0B2154"/><circle cx="96" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="140" cy="219" r="19" fill="#0B2154"/><circle cx="140" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="310" cy="219" r="19" fill="#0B2154"/><circle cx="310" cy="219" r="8.0" fill="#B9C8E2"/><text x="20" y="282" font-family="Poppins, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#0B2154" opacity=".75">FOTOS EM BREVE</text></svg><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volvo</p>
+          <h3>VM 270</h3>
+          <p class="sub">Sider</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2022/22</dd></div><div class="spec"><dt>Km</dt><dd>354.081</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volvo%20VM%20270%202022/22%20%28sider%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volvo%20VM%20270%202022/22%20%28sider%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><svg viewBox="0 0 400 300" role="img" aria-label="Ilustração de Volkswagen Constellation 24.280, baú com plataforma" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g-bau" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E4EEFA"/><stop offset="1" stop-color="#C6DAF2"/></linearGradient></defs><rect width="400" height="300" fill="url(#g-bau)"/><path d="M360 0 L400 0 L400 300 L270 300 Z" fill="#CADDF4"/><path d="M352 0 L366 0 L276 300 L262 300 Z" fill="#CE181E" opacity=".9"/><rect x="0" y="238" width="400" height="4" fill="#0B2154" opacity=".18"/><rect x="52" y="204" width="220" height="12" rx="2" fill="#0B2154"/><rect x="52" y="88" width="202" height="116" rx="4" fill="#0B2154"/><rect x="52" y="188" width="202" height="6" fill="#CE181E"/><path d="M262 216 L262 124 Q262 118 268 118 L326 118 L340 152 L340 216 Z" fill="#0B2154"/><path d="M272 128 L322 128 L334 152 L272 152 Z" fill="#B9C8E2"/><rect x="332" y="190" width="8" height="10" rx="2" fill="#B9C8E2"/><circle cx="96" cy="219" r="19" fill="#0B2154"/><circle cx="96" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="140" cy="219" r="19" fill="#0B2154"/><circle cx="140" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="310" cy="219" r="19" fill="#0B2154"/><circle cx="310" cy="219" r="8.0" fill="#B9C8E2"/><text x="20" y="282" font-family="Poppins, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#0B2154" opacity=".75">FOTOS EM BREVE</text></svg><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Constellation 24.280</h3>
+          <p class="sub">Baú com plataforma</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2022/23</dd></div><div class="spec"><dt>Km</dt><dd>135.509</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202022/23%20%28ba%C3%BA%20com%20plataforma%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202022/23%20%28ba%C3%BA%20com%20plataforma%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="chassi" data-qtd="1">
+        <div class="foto"><svg viewBox="0 0 400 300" role="img" aria-label="Ilustração de Volkswagen Constellation 24.280, no chassi, 9,50 m" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g-chassi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E4EEFA"/><stop offset="1" stop-color="#C6DAF2"/></linearGradient></defs><rect width="400" height="300" fill="url(#g-chassi)"/><path d="M360 0 L400 0 L400 300 L270 300 Z" fill="#CADDF4"/><path d="M352 0 L366 0 L276 300 L262 300 Z" fill="#CE181E" opacity=".9"/><rect x="0" y="238" width="400" height="4" fill="#0B2154" opacity=".18"/><rect x="52" y="204" width="220" height="12" rx="2" fill="#0B2154"/><rect x="52" y="198" width="210" height="4" fill="#CE181E"/><path d="M262 216 L262 124 Q262 118 268 118 L326 118 L340 152 L340 216 Z" fill="#0B2154"/><path d="M272 128 L322 128 L334 152 L272 152 Z" fill="#B9C8E2"/><rect x="332" y="190" width="8" height="10" rx="2" fill="#B9C8E2"/><circle cx="96" cy="219" r="19" fill="#0B2154"/><circle cx="96" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="140" cy="219" r="19" fill="#0B2154"/><circle cx="140" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="310" cy="219" r="19" fill="#0B2154"/><circle cx="310" cy="219" r="8.0" fill="#B9C8E2"/><text x="20" y="282" font-family="Poppins, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#0B2154" opacity=".75">FOTOS EM BREVE</text></svg><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Constellation 24.280</h3>
+          <p class="sub">No chassi, 9,50 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2017/18</dd></div><div class="spec"><dt>Km</dt><dd>460.698</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202017/18%20%28no%20chassi%2C%209%2C50%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Constellation%2024.280%202017/18%20%28no%20chassi%2C%209%2C50%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/express_a.jpg" alt="Volkswagen Delivery Express 2024/25, baú de 4,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Delivery Express</h3>
+          <p class="sub">Baú de 4,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2024/25</dd></div><div class="spec"><dt>Km</dt><dd>17.339</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/express_b.jpg" alt="Volkswagen Delivery Express 2024/25, baú de 4,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Delivery Express</h3>
+          <p class="sub">Baú de 4,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2024/25</dd></div><div class="spec"><dt>Km</dt><dd>55.388</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/express_c.jpg" alt="Volkswagen Delivery Express 2024/25, baú de 4,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Delivery Express</h3>
+          <p class="sub">Baú de 4,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2024/25</dd></div><div class="spec"><dt>Km</dt><dd>66.428</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/express_d.jpg" alt="Volkswagen Delivery Express 2024/25, baú de 4,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Delivery Express</h3>
+          <p class="sub">Baú de 4,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2024/25</dd></div><div class="spec"><dt>Km</dt><dd>70.532</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/express_e.jpg" alt="Volkswagen Delivery Express 2024/25, baú de 4,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Delivery Express</h3>
+          <p class="sub">Baú de 4,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2024/25</dd></div><div class="spec"><dt>Km</dt><dd>75.817</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/express_f.jpg" alt="Volkswagen Delivery Express 2024/25, baú de 4,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Delivery Express</h3>
+          <p class="sub">Baú de 4,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2024/25</dd></div><div class="spec"><dt>Km</dt><dd>84.880</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="bau" data-qtd="1">
+        <div class="foto"><img src="fotos/express_g.jpg" alt="Volkswagen Delivery Express 2024/25, baú de 4,20 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>Delivery Express</h3>
+          <p class="sub">Baú de 4,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2024/25</dd></div><div class="spec"><dt>Km</dt><dd>94.633</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%20Delivery%20Express%202024/25%20%28ba%C3%BA%20de%204%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="chassi" data-qtd="1">
+        <div class="foto"><svg viewBox="0 0 400 300" role="img" aria-label="Ilustração de Volkswagen 9.180, no chassi, 6,20 m" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g-chassi_curto" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E4EEFA"/><stop offset="1" stop-color="#C6DAF2"/></linearGradient></defs><rect width="400" height="300" fill="url(#g-chassi_curto)"/><path d="M360 0 L400 0 L400 300 L270 300 Z" fill="#CADDF4"/><path d="M352 0 L366 0 L276 300 L262 300 Z" fill="#CE181E" opacity=".9"/><rect x="0" y="238" width="400" height="4" fill="#0B2154" opacity=".18"/><rect x="120" y="204" width="152" height="12" rx="2" fill="#0B2154"/><rect x="120" y="198" width="142" height="4" fill="#CE181E"/><path d="M262 216 L262 124 Q262 118 268 118 L326 118 L340 152 L340 216 Z" fill="#0B2154"/><path d="M272 128 L322 128 L334 152 L272 152 Z" fill="#B9C8E2"/><rect x="332" y="190" width="8" height="10" rx="2" fill="#B9C8E2"/><circle cx="150" cy="219" r="19" fill="#0B2154"/><circle cx="150" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="310" cy="219" r="19" fill="#0B2154"/><circle cx="310" cy="219" r="8.0" fill="#B9C8E2"/><text x="20" y="282" font-family="Poppins, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#0B2154" opacity=".75">FOTOS EM BREVE</text></svg><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>9.180</h3>
+          <p class="sub">No chassi, 6,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2023/24</dd></div><div class="spec"><dt>Km</dt><dd>163.601</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%209.180%202023/24%20%28no%20chassi%2C%206%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%209.180%202023/24%20%28no%20chassi%2C%206%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="refrigerado" data-qtd="1">
+        <div class="foto"><svg viewBox="0 0 400 300" role="img" aria-label="Ilustração de Mercedes-Benz Accelo 1016, baú refrigerado de 5,20 m" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g-refrigerado" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E4EEFA"/><stop offset="1" stop-color="#C6DAF2"/></linearGradient></defs><rect width="400" height="300" fill="url(#g-refrigerado)"/><path d="M360 0 L400 0 L400 300 L270 300 Z" fill="#CADDF4"/><path d="M352 0 L366 0 L276 300 L262 300 Z" fill="#CE181E" opacity=".9"/><rect x="0" y="238" width="400" height="4" fill="#0B2154" opacity=".18"/><rect x="120" y="204" width="152" height="12" rx="2" fill="#0B2154"/><rect x="120" y="88" width="134" height="116" rx="4" fill="#0B2154"/><rect x="120" y="188" width="134" height="6" fill="#CE181E"/><rect x="228" y="70" width="34" height="34" rx="4" fill="#CE181E"/><rect x="234" y="78" width="22" height="3" fill="#fff" opacity=".8"/><rect x="234" y="86" width="22" height="3" fill="#fff" opacity=".8"/><rect x="234" y="94" width="22" height="3" fill="#fff" opacity=".8"/><path d="M262 216 L262 124 Q262 118 268 118 L326 118 L340 152 L340 216 Z" fill="#0B2154"/><path d="M272 128 L322 128 L334 152 L272 152 Z" fill="#B9C8E2"/><rect x="332" y="190" width="8" height="10" rx="2" fill="#B9C8E2"/><circle cx="150" cy="219" r="19" fill="#0B2154"/><circle cx="150" cy="219" r="8.0" fill="#B9C8E2"/><circle cx="310" cy="219" r="19" fill="#0B2154"/><circle cx="310" cy="219" r="8.0" fill="#B9C8E2"/><text x="20" y="282" font-family="Poppins, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="1.5" fill="#0B2154" opacity=".75">FOTOS EM BREVE</text></svg><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Mercedes-Benz</p>
+          <h3>Accelo 1016</h3>
+          <p class="sub">Baú refrigerado de 5,20 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2016/16</dd></div><div class="spec"><dt>Km</dt><dd>226.840</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Accelo%201016%202016/16%20%28ba%C3%BA%20refrigerado%20de%205%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Mercedes-Benz%20Accelo%201016%202016/16%20%28ba%C3%BA%20refrigerado%20de%205%2C20%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+      <article class="card" data-tipo="carroceria" data-qtd="1">
+        <div class="foto"><img src="fotos/vw11180_b.jpg" alt="Volkswagen 11.180 2023/24, carroceria de ferro de 5,10 m, no pátio da Artese Veículos" width="880" height="660" loading="lazy"><span class="selo selo-prep">Em preparação</span></div>
+        <div class="corpo">
+          <p class="marca">Volkswagen</p>
+          <h3>11.180</h3>
+          <p class="sub">Carroceria de ferro de 5,10 m</p>
+          <dl class="specs"><div class="spec"><dt>Ano</dt><dd>2023/24</dd></div><div class="spec"><dt>Km</dt><dd>80.405</dd></div></dl>
+          <p class="nota">No pátio, passando pela oficina antes de ir pro anúncio.</p>
+          <div class="acoes"><a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20Volkswagen%2011.180%202023/24%20%28carroceria%20de%20ferro%20de%205%2C10%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." data-msg="Ol%C3%A1%21%20Vi%20o%20Volkswagen%2011.180%202023/24%20%28carroceria%20de%20ferro%20de%205%2C10%20m%29%20em%20prepara%C3%A7%C3%A3o%20no%20cat%C3%A1logo%20da%20Artese%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener">Chamar no WhatsApp</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <div class="rodape-in">
+    <div>
+      <h3>Venha ver de perto</h3>
+      <p>Rua Eduardo Froner, 89, Bonsucesso, Guarulhos, SP. Ao lado da Via Dutra, km 211.</p>
+      <p>Segunda a sexta, das 8h às 17h30.</p>
+    </div>
+    <div>
+      <h3>Fale com a loja</h3>
+      <p>WhatsApp (11) 94764-5410, (11) 94764-5408 e (11) 94725-6060</p>
+      <p>Telefone (11) 2941-3995</p>
+      <a class="btn btn-wa" href="https://wa.me/5511947645410?text=Ol%C3%A1%21%20Vi%20o%20cat%C3%A1logo%20da%20Artese%20e%20quero%20falar%20com%20um%20vendedor." data-msg="Ol%C3%A1%21%20Vi%20o%20cat%C3%A1logo%20da%20Artese%20e%20quero%20falar%20com%20um%20vendedor." target="_blank" rel="noopener">Chamar no WhatsApp</a>
+    </div>
+    <div>
+      <h3>Acompanhe</h3>
+      <p><a href="https://www.instagram.com/arteseveiculos/" target="_blank" rel="noopener">Instagram @arteseveiculos</a></p>
+      <p><a href="https://www.tiktok.com/@artese.veiculos" target="_blank" rel="noopener">TikTok @artese.veiculos</a></p>
+      <p><a href="https://lista.mercadolivre.com.br/veiculos/_CustId_46072099" target="_blank" rel="noopener">Anúncios no Mercado Livre</a></p>
+    </div>
+    <p class="atual">Catálogo atualizado em 11/11/2026. Disponibilidade sujeita a alteração.</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var chips = document.querySelectorAll('.chip');
+    var secoes = document.querySelectorAll('.secao');
+    var conta = document.getElementById('conta');
+    var total = 28;
+    function aplicar(f) {
+      var n = 0;
+      secoes.forEach(function (s) {
+        var ns = 0;
+        s.querySelectorAll('.card').forEach(function (c) {
+          var ok = f === 'todos' || c.getAttribute('data-tipo') === f;
+          c.hidden = !ok;
+          if (ok) ns += parseInt(c.getAttribute('data-qtd'), 10) || 1;
+        });
+        s.hidden = ns === 0;
+        s.querySelector('[data-n]').textContent = ns;
+        n += ns;
+      });
+      chips.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-f') === f ? 'true' : 'false'); });
+      conta.textContent = 'Mostrando ' + n + ' de ' + total + ' veículos';
+    }
+    chips.forEach(function (b) {
+      b.addEventListener('click', function () { aplicar(b.getAttribute('data-f')); });
+    });
+    // Rodízio: cada clique sorteia um dos números da loja antes de abrir o WhatsApp.
+    var nums = ["5511947645410", "5511947645408", "5511947256060"];
+    document.querySelectorAll('a[data-msg]').forEach(function (a) {
+      a.addEventListener('click', function () {
+        var n = nums[Math.floor(Math.random() * nums.length)];
+        a.href = 'https://wa.me/' + n + '?text=' + a.getAttribute('data-msg');
+      });
+    });
+  })();
+</script>
+</body>
+</html>
